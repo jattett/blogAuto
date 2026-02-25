@@ -1,0 +1,91 @@
+// Blog-Auto-Bot Prisma schema (SQLite compatible)
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model BlogAccount {
+  id               Int      @id @default(autoincrement())
+  platform         String   // WORDPRESS
+  accountAlias     String
+  platformUserId   String?
+  siteBaseUrl      String?
+  credentialRef    String?
+  isActive         Boolean  @default(true)
+  postingSchedule  String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  posts            PostHistory[]
+
+  @@unique([platform, accountAlias])
+}
+
+model PostHistory {
+  id             Int        @id @default(autoincrement())
+  blogAccountId  Int
+  platform       String     // WORDPRESS
+  keyword        String
+  title          String
+  slug           String
+  status         String     @default("PENDING") // PENDING, PUBLISHED, FAILED, SKIPPED
+  publishedAt    DateTime?
+  sourceUrl      String?
+  publishedUrl   String?
+  errorMessage   String?
+  contentHash    String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  blogAccount    BlogAccount @relation(fields: [blogAccountId], references: [id])
+}
+
+model ContentTemplate {
+  id          Int      @id @default(autoincrement())
+  alias       String   @unique
+  personaName String
+  styleGuide  String
+  keywordTone String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model KeywordCandidate {
+  id        Int      @id @default(autoincrement())
+  keyword   String
+  score     Int      @default(0)
+  source    String
+  createdAt DateTime @default(now())
+}
+
+model TrackedKeyword {
+  id        Int      @id @default(autoincrement())
+  keyword   String
+  score     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ScheduledJob {
+  id               Int       @id @default(autoincrement())
+  jobId            String    @unique
+  taskType         String
+  cronExpression   String
+  timezone         String    @default("Asia/Seoul")
+  payload          String    // Store as JSON string for SQLite
+  status           String    @default("running")
+  runCount         Int       @default(0)
+  failureCount     Int       @default(0)
+  maxFailureCount  Int       @default(3)
+  autoStopReason   String?
+  lastRunAt        DateTime?
+  lastStatus       String?
+  lastError        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
