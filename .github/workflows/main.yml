@@ -1,23 +1,27 @@
 name: Blog Auto Post
 
 on:
-schedule:
-- cron: '0 1,3,5,7 * * *'
-workflow_dispatch:
+  schedule:
+    - cron: '0 1,3,5,7 * * *'
+  workflow_dispatch:
 
 jobs:
-post:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v4
-- uses: actions/setup-node@v4
-with:
-node-version: '20'
-- run: npm install
-- name: Run Script
-env:
-NODE_TLS_REJECT_UNAUTHORIZED: '0'
-WORDPRESS_DEFAULT_SITE_URL: ${{ secrets.WORDPRESS_DEFAULT_SITE_URL }}
-WORDPRESS_DEFAULT_USERNAME: ${{ secrets.WORDPRESS_DEFAULT_USERNAME }}
-WORDPRESS_DEFAULT_APP_PASSWORD: ${{ secrets.WORDPRESS_DEFAULT_APP_PASSWORD }}
-run: node scripts/autoNewsPost.js
+  post:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install
+
+      - name: Run Script
+        env:
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
+          WORDPRESS_DEFAULT_SITE_URL: ${{ secrets.WORDPRESS_DEFAULT_SITE_URL }}
+          WORDPRESS_DEFAULT_USERNAME: ${{ secrets.WORDPRESS_DEFAULT_USERNAME }}
+          WORDPRESS_DEFAULT_APP_PASSWORD: ${{ secrets.WORDPRESS_DEFAULT_APP_PASSWORD }}
+        run: node scripts/autoNewsPost.js
