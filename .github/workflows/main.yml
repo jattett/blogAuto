@@ -2,24 +2,22 @@ name: Blog Auto Post
 
 on:
 schedule:
-- cron: '0 1,3,5,7 * * *' # 한국 시간 10시, 12시, 14시, 16시 자동 실행
-workflow_dispatch: # 직접 실행 버튼 추가
+- cron: '0 1,3,5,7 * * *'
+workflow_dispatch:
 
 jobs:
 post:
 runs-on: ubuntu-latest
 steps:
-- uses: actions/checkout@v4
-
-- name: Setup Node.js
+- name: Checkout
+uses: actions/checkout@v4
+- name: Setup Node
 uses: actions/setup-node@v4
 with:
 node-version: '20'
-
-- name: Install dependencies
+- name: Install
 run: npm install
-
-- name: Run Auto News Post Script
+- name: Run
 env:
 NODE_TLS_REJECT_UNAUTHORIZED: '0'
 WORDPRESS_DEFAULT_SITE_URL: ${{ secrets.WORDPRESS_DEFAULT_SITE_URL }}
